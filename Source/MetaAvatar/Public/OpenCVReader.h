@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opencv2/opencv.hpp"
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
 #include "MediaTexture.h"
@@ -25,6 +26,7 @@ class METAAVATAR_API AOpenCVReader : public AActor
 public:
     // Sets default values for this actor's properties
     AOpenCVReader(const FObjectInitializer& ObjectInitializer);
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
 protected:
     // Called when the game starts or when spawned

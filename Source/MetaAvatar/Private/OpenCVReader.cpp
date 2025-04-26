@@ -52,6 +52,11 @@ void AOpenCVReader::BeginPlay()
 #endif
     OpenCV_Texture2D->SRGB = RenderTarget->SRGB;
 }
+void AOpenCVReader::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+    cv::destroyAllWindows();
+}
 void AOpenCVReader::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -111,11 +116,11 @@ bool AOpenCVReader::ReadFrame() {
     ENQUEUE_RENDER_COMMAND(WriteOpenCVTexture)(
         [RTarget = RenderTarget, RTexture = OpenCV_Texture2D, ColorD = ColorData](FRHICommandList& RHICmdList)
         {
-            void* TextureData = RTexture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+            void* TextureData = RTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
             const int32 TextureDataSize = ColorD.Num() * 4;
             // set the texture data
             FMemory::Memcpy(TextureData, ColorD.GetData(), TextureDataSize);
-            RTexture->PlatformData->Mips[0].BulkData.Unlock();
+            RTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
             // Apply Texture changes to GPU memory
             RTexture->UpdateResource();
         });
@@ -127,14 +132,14 @@ bool AOpenCVReader::ReadFrame() {
 void AOpenCVReader::OnBackBufferReady(SWindow& SlateWindow, const FTexture2DRHIRef& BackBuffer) {
     ensure(IsInRenderingThread());
     FRHICommandListImmediate& RHICmdList = GRHICommandList.GetImmediateCommandList();
-    FRHITexture2D* CachedTexture = RenderTarget_32Bit->Resource->TextureRHI->GetTexture2D();
+    FRHITexture2D* CachedTexture = RenderTarget_32Bit->GetResource()->TextureRHI->GetTexture2D();
 
     FRHICopyTextureInfo CopyInfo;
 
     RHICmdList.CopyTexture(BackBuffer, CachedTexture, CopyInfo);
 
     if (applyToPlayerScreen && RenderTarget_PlayerScreen) {
-        CachedTexture = RenderTarget_PlayerScreen->Resource->TextureRHI->GetTexture2D();
+        CachedTexture = RenderTarget_PlayerScreen->GetResource()->TextureRHI->GetTexture2D();
         RHICmdList.CopyTexture(CachedTexture, BackBuffer, CopyInfo);
     }
 }

@@ -106,14 +106,14 @@ bool AOpenCV_FaceCapture::ReadFrame() {
             //This function will allocate memory for FormattedImageData pointer and then you can read from here all the pixels info
             //RTexture_Pre->PlatformData->Mips[0].BulkData.GetCopy((void**)&ColorD);
             //RTexture_Pre->PlatformData->Mips[0].BulkData.GetCopy((void**)&ColorD);
-            void* TextureData1 = RTexture_Pre->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-            void* TextureData2 = RTexture_Post->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+            void* TextureData1 = RTexture_Pre->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+            void* TextureData2 = RTexture_Post->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
             const int32 TextureDataSize = ColorD.Num() * 4;
             // set the texture data
             FMemory::Memcpy(TextureData1, TextureData2, TextureDataSize);
             //FMemory::Memcpy(TextureData, ColorD.GetData(), TextureDataSize);
-            RTexture_Pre->PlatformData->Mips[0].BulkData.Unlock();
-            RTexture_Post->PlatformData->Mips[0].BulkData.Unlock();
+            RTexture_Pre->GetPlatformData()->Mips[0].BulkData.Unlock();
+            RTexture_Post->GetPlatformData()->Mips[0].BulkData.Unlock();
             // Apply Texture changes to GPU memory
             RTexture_Pre->UpdateResource();
             RTexture_Post->UpdateResource();
